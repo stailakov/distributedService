@@ -6,6 +6,8 @@ package ru.example.netty.model;
 public class RequestData {
 
     private int intValue;
+    private int term;
+    private int peer;
     private String stringValue;
 
     public int getIntValue() {
@@ -24,10 +26,28 @@ public class RequestData {
         this.stringValue = stringValue;
     }
 
+    public int getTerm() {
+        return term;
+    }
+
+    public void setTerm(int term) {
+        this.term = term;
+    }
+
+    public int getPeer() {
+        return peer;
+    }
+
+    public void setPeer(int peer) {
+        this.peer = peer;
+    }
+
     @Override
     public String toString() {
-        return "ru.example.netty.model.RequestData{" +
+        return "RequestData{" +
                 "intValue=" + intValue +
+                ", term=" + term +
+                ", peer=" + peer +
                 ", stringValue='" + stringValue + '\'' +
                 '}';
     }

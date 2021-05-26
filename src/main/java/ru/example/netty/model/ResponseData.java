@@ -6,6 +6,8 @@ package ru.example.netty.model;
 public class ResponseData {
 
     private int intValue;
+    private int term;
+    private int peer;
 
 
     public int getIntValue() {
@@ -16,10 +18,28 @@ public class ResponseData {
         this.intValue = intValue;
     }
 
+    public int getTerm() {
+        return term;
+    }
+
+    public void setTerm(int term) {
+        this.term = term;
+    }
+
+    public int getPeer() {
+        return peer;
+    }
+
+    public void setPeer(int peer) {
+        this.peer = peer;
+    }
+
     @Override
     public String toString() {
-        return "ru.example.netty.model.ResponseData{" +
+        return "ResponseData{" +
                 "intValue=" + intValue +
+                ", term=" + term +
+                ", peer=" + peer +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package ru.example.netty.client;
 
+import com.esotericsoftware.kryo.Kryo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -8,9 +9,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import ru.example.netty.decod.ResponseDataDecoder;
-import ru.example.netty.encod.RequestDataEncoder;
-import ru.example.netty.handler.ClientHandler;
+import ru.example.netty.decod.ObjectDecoder;
+import ru.example.netty.encod.ObjectEncoder;
+import ru.example.netty.handler.HeartbeatClientHandler;
 
 import java.net.InetSocketAddress;
 
@@ -20,6 +21,7 @@ import java.net.InetSocketAddress;
 public class HttpClient {
 
     public static void main(String[] args) throws Exception {
+        Kryo kryo = new Kryo();
         System.out.println("start");
         String host = "localhost";
         int port =8080;
@@ -35,8 +37,12 @@ public class HttpClient {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline()
-                            .addLast(new RequestDataEncoder(),
-                                    new ResponseDataDecoder(), new ClientHandler());
+                            .addLast(
+                                    new ObjectEncoder(kryo),
+                                    new ObjectDecoder(kryo),
+                                    new HeartbeatClientHandler()
+
+                            );
                 }
             });
 

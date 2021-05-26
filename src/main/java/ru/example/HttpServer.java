@@ -1,5 +1,6 @@
 package ru.example;
 
+import com.esotericsoftware.kryo.Kryo;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -17,13 +18,9 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import ru.example.netty.decod.RequestDecoder;
-import ru.example.netty.encod.ResponseDataEncoder;
-import ru.example.netty.handler.ProcessingHandler;
-import ru.example.server.config.PropertiesLoader;
-import ru.example.server.election.ElectionTimer;
-import ru.example.server.heartbeat.HeartbeatTimer;
-import ru.example.server.timer.ServerTimer;
+import ru.example.netty.decod.ObjectDecoder;
+import ru.example.netty.encod.ObjectEncoder;
+import ru.example.netty.handler.HeartbeatProcessingHandler;
 
 import java.nio.charset.StandardCharsets;
 
@@ -32,14 +29,17 @@ import java.nio.charset.StandardCharsets;
  */
 public class HttpServer {
     public static void main(String[] args) throws Exception {
+//
+//        ServerTimer heartbeatTimer = new HeartbeatTimer();
+//        ServerTimer electionTimer = new ElectionTimer();
 
-        ServerTimer heartbeatTimer = new HeartbeatTimer();
-        ServerTimer electionTimer = new ElectionTimer();
 
-
+        HttpServer server = new HttpServer();
+        server.start();
     }
 
     public void start() throws InterruptedException {
+        Kryo kryo = new Kryo();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         ChannelFuture channelFuture = null;
@@ -52,9 +52,11 @@ public class HttpServer {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new RequestDecoder(),
-                                            new ResponseDataEncoder(),
-                                            new ProcessingHandler());
+                                    .addLast(
+                                            new ObjectDecoder(kryo),
+                                            new ObjectEncoder(kryo),
+                                            new HeartbeatProcessingHandler()
+                                    );
                             ;
                         }
                     })
