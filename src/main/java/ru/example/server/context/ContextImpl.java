@@ -3,6 +3,7 @@ package ru.example.server.context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.example.server.node.NodeProperties;
+import ru.example.server.node.NodePropertiesImpl;
 import ru.example.server.node.Peer;
 import ru.example.server.node.Peers;
 import ru.example.server.node.State;
@@ -15,7 +16,7 @@ import static ru.example.server.node.State.FOLLOWER;
 /**
  * @author TaylakovSA
  */
-public class ContextImpl  implements Context {
+public class ContextImpl implements Context {
 
     Logger log = LoggerFactory.getLogger(ContextImpl.class);
 
@@ -23,6 +24,11 @@ public class ContextImpl  implements Context {
     private Term term;
     private NodeProperties nodeProperties;
 
+    public ContextImpl() {
+        this.peers = new Peers();
+        this.nodeProperties = new NodePropertiesImpl();
+        this.term = new Term(nodeProperties);
+    }
 
     @Override
     public Integer getId() {
@@ -103,7 +109,6 @@ public class ContextImpl  implements Context {
     public void setCurrentTerm(Long term) {
         this.term.setCurrentTerm(term);
     }
-
 
     @Override
     public Integer getQuorum() {
