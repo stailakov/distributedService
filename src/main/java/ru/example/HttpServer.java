@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpVersion;
 import ru.example.netty.decod.RequestDecoder;
 import ru.example.netty.encod.ResponseDataEncoder;
 import ru.example.netty.handler.ProcessingHandler;
+import ru.example.server.config.PropertiesLoader;
 
 import java.nio.charset.StandardCharsets;
 
@@ -28,6 +29,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class HttpServer {
     public static void main(String[] args) throws Exception {
+        PropertiesLoader loader = new PropertiesLoader();
+
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         ChannelFuture channelFuture = null;
