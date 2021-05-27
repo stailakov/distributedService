@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * @author TaylakovSA
  */
-public class JsonUtil {
+public class JsonUtil<T> {
 
     public static <T> T toObject(String json, Class<T> t) {
         ObjectMapper mapper = new ObjectMapper();

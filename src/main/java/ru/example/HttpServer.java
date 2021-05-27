@@ -16,11 +16,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import ru.example.netty.decod.ObjectDecoder;
-import ru.example.netty.encod.ObjectEncoder;
-import ru.example.netty.handler.HeartbeatProcessingHandler;
+import ru.example.netty.handler.FilterHandler;
+import ru.example.netty.handler.HttpProcessingHandler;
+import ru.example.server.election.ElectionTimer;
+import ru.example.server.heartbeat.HeartbeatTimer;
+import ru.example.server.timer.ServerTimer;
 
 import java.nio.charset.StandardCharsets;
 
@@ -30,8 +35,8 @@ import java.nio.charset.StandardCharsets;
 public class HttpServer {
     public static void main(String[] args) throws Exception {
 //
-//        ServerTimer heartbeatTimer = new HeartbeatTimer();
-//        ServerTimer electionTimer = new ElectionTimer();
+        ServerTimer heartbeatTimer = new HeartbeatTimer();
+        ServerTimer electionTimer = new ElectionTimer();
 
 
         HttpServer server = new HttpServer();
@@ -53,9 +58,14 @@ public class HttpServer {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
                                     .addLast(
-                                            new ObjectDecoder(kryo),
-                                            new ObjectEncoder(kryo),
-                                            new HeartbeatProcessingHandler()
+                                            new HttpResponseEncoder(),
+                                            new HttpRequestDecoder(),
+                                            new HttpObjectAggregator(Integer.MAX_VALUE),
+                                            new FilterHandler(),
+                                            new HttpProcessingHandler()
+//                                            new ObjectDecoder(kryo),
+//                                            new ObjectEncoder(kryo),
+//                                            new HeartbeatProcessingHandler()
                                     );
                             ;
                         }

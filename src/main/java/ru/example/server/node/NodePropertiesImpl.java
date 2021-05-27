@@ -8,6 +8,7 @@ import ru.example.server.exceptions.NotActiveException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.example.server.node.State.FOLLOWER;
+import static ru.example.server.node.State.LEADER;
 
 /**
  * @author TaylakovSA
@@ -17,7 +18,7 @@ public class NodePropertiesImpl implements NodeProperties {
     final static Logger log = LoggerFactory.getLogger(NodePropertiesImpl.class);
 
     private Integer id;
-    private volatile State state = FOLLOWER;
+    private volatile State state = LEADER;
     private final AtomicInteger commitIndex = new AtomicInteger(-1);
     private final AtomicInteger lastApplied = new AtomicInteger(-1);
     Boolean active = true;
