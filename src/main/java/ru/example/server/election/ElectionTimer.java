@@ -7,12 +7,21 @@ import static ru.example.server.node.State.LEADER;
 /**
  * @author TaylakovSA
  */
-public class ElectionTimer extends ServerTimer {
+public final class ElectionTimer extends ServerTimer {
 
     private final ElectionService electionService;
 
-    public ElectionTimer() {
-        this.electionService = new ElectionService();
+    private static ElectionTimer instance;
+
+    public static synchronized ElectionTimer getInstance() {
+        if (instance == null) {
+            instance = new ElectionTimer(new ElectionService());
+        }
+        return instance;
+    }
+
+    private ElectionTimer(ElectionService electionService) {
+        this.electionService = electionService;
     }
 
     @Override

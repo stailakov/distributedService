@@ -1,11 +1,9 @@
 package ru.example.netty.dto;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 /**
  * @author TaylakovSA
  */
-public class HeartbeatResponseDto {
+public class HeartbeatResponseDto  {
 
     private Integer id;
 
@@ -13,29 +11,26 @@ public class HeartbeatResponseDto {
 
     private Boolean success;
 
-    private Integer matchIndex;
 
     private String statusCode;
 
     public HeartbeatResponseDto() {
     }
 
-//    public HeartbeatResponseDto(Integer id, Long term, Boolean success, Integer matchIndex)
-//    {
-//        this.id = id;
-//        this.term = term;
-//        this.success = success;
-//        this.matchIndex = matchIndex;
-//        this.statusCode = HttpResponseStatus.OK;
-//    }
-//
-//    public HeartbeatResponseDto(Integer id, HttpResponseStatus statusCode) {
-//        this.id = id;
-//        this.statusCode = statusCode;
-//        this.term = null;
-//        this.success = false;
-//        matchIndex = null;
-//    }
+    public HeartbeatResponseDto(Integer id, Long term, Boolean success)
+    {
+        this.id = id;
+        this.term = term;
+        this.success = success;
+        this.statusCode = "OK";
+    }
+
+    public HeartbeatResponseDto(Integer id, String statusCode) {
+        this.id = id;
+        this.statusCode = statusCode;
+        this.term = null;
+        this.success = false;
+    }
 
     public Integer getId() {
         return id;
@@ -49,9 +44,6 @@ public class HeartbeatResponseDto {
         return success;
     }
 
-    public Integer getMatchIndex() {
-        return matchIndex;
-    }
 
     public String getStatusCode() {
         return statusCode;
@@ -69,10 +61,6 @@ public class HeartbeatResponseDto {
         this.success = success;
     }
 
-    public void setMatchIndex(Integer matchIndex) {
-        this.matchIndex = matchIndex;
-    }
-
     public void setStatusCode(String statusCode) {
         this.statusCode = statusCode;
     }
@@ -83,7 +71,6 @@ public class HeartbeatResponseDto {
                 "id=" + id +
                 ", term=" + term +
                 ", success=" + success +
-                ", matchIndex=" + matchIndex +
                 ", statusCode=" + statusCode +
                 '}';
     }

@@ -36,7 +36,7 @@ public class HttpServer {
     public static void main(String[] args) throws Exception {
 //
         ServerTimer heartbeatTimer = new HeartbeatTimer();
-        ServerTimer electionTimer = new ElectionTimer();
+        ServerTimer electionTimer = ElectionTimer.getInstance();
 
 
         HttpServer server = new HttpServer();
@@ -61,7 +61,7 @@ public class HttpServer {
                                             new HttpResponseEncoder(),
                                             new HttpRequestDecoder(),
                                             new HttpObjectAggregator(Integer.MAX_VALUE),
-                                            new FilterHandler(),
+//                                            new FilterHandler(),
                                             new HttpProcessingHandler()
 //                                            new ObjectDecoder(kryo),
 //                                            new ObjectEncoder(kryo),

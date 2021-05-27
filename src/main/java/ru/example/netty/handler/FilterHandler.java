@@ -15,10 +15,12 @@ import java.util.Map;
  */
 public class FilterHandler extends MessageToMessageDecoder<DefaultFullHttpRequest> {
 
-    private Map<String, Set<HttpMethod>> requestMapping;
+    private final Map<String, Set<HttpMethod>> requestMapping;
+
     public FilterHandler() {
         requestMapping = new HashMap<>();
         requestMapping.put("/heartbeat", Set.of(HttpMethod.POST));
+        requestMapping.put("/election", Set.of(HttpMethod.POST));
     }
 
     @Override
@@ -27,23 +29,22 @@ public class FilterHandler extends MessageToMessageDecoder<DefaultFullHttpReques
         String url = request.getUri();
         url = url == null ? "" : url.toLowerCase();
         if (!requestMapping.containsKey(url)) {
-            HttpServer.sendError(ctx, "ресурс не найден", HttpResponseStatus.NOT_FOUND);
+            HttpServer.sendError(ctx, "resource not found", HttpResponseStatus.NOT_FOUND);
             return;
         }
 
         Set<HttpMethod> methods = requestMapping.get(url);
 
         if (!methods.contains(request.getMethod())) {
-            HttpServer.sendError(ctx, "метод к данному ресурсу не применим", HttpResponseStatus.NOT_ACCEPTABLE);
+            HttpServer.sendError(ctx, "method resource bot acceptable", HttpResponseStatus.NOT_ACCEPTABLE);
             return;
         }
-
         out.add(request);
         request.retain();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        HttpServer.sendError(ctx, "ошибка сервера:" + cause.getMessage(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        HttpServer.sendError(ctx, "server error:" + cause.getMessage(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
     }
 }

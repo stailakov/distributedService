@@ -11,8 +11,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestEncoder;
 import io.netty.handler.codec.http.HttpResponseDecoder;
-import ru.example.netty.dto.HeartbeatRequestDto;
-import ru.example.netty.dto.HeartbeatResponseDto;
+import io.netty.util.concurrent.FutureListener;
+
 import ru.example.netty.handler.HttpClientHandler;
 
 import java.net.InetSocketAddress;
@@ -21,15 +21,6 @@ import java.net.InetSocketAddress;
  * @author TaylakovSA
  */
 public class HttpClient<REQ, RES> {
-
-    public static void main(String[] args) throws Exception {
-        HttpClient<HeartbeatRequestDto, HeartbeatResponseDto> client = new HttpClient<>();
-        HeartbeatRequestDto requestDto = new HeartbeatRequestDto();
-        requestDto.setLeaderId(123);
-
-        HeartbeatResponseDto o = client.send(requestDto, HeartbeatResponseDto.class, "/heartbeat");
-        System.out.println(o);
-    }
 
     public RES send(REQ req, Class<RES> resClass, String uri) throws InterruptedException {
         String host = "localhost";
@@ -56,7 +47,13 @@ public class HttpClient<REQ, RES> {
                 }
             });
 
-            ChannelFuture f = b.connect().sync();
+            ChannelFuture f = b.connect();
+            f.addListener((FutureListener<Void>) future -> {
+                if (!f.isSuccess()) {
+                    throw new Exception("Test Connection failed");
+                }
+            });
+            f.sync();
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
@@ -64,4 +61,5 @@ public class HttpClient<REQ, RES> {
 
         return httpClientHandler.getFuture();
     }
+
 }

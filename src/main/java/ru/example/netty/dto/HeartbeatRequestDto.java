@@ -5,23 +5,15 @@ package ru.example.netty.dto;
  */
 public class HeartbeatRequestDto {
 
-    public HeartbeatRequestDto() {
-    }
 
-    public HeartbeatRequestDto(Long term, Integer leaderId, Integer prevLogIndex, Long prevLogTerm, Integer leaderCommit) {
+    public HeartbeatRequestDto(Long term, Integer leaderId, Integer leaderCommit) {
         this.term = term;
         this.leaderId = leaderId;
-        this.prevLogIndex = prevLogIndex;
-        this.prevLogTerm = prevLogTerm;
         this.leaderCommit = leaderCommit;
     }
 
     private Long term;
     private Integer leaderId;
-
-    private Integer prevLogIndex;
-
-    private Long prevLogTerm;
 
     private Integer leaderCommit;
 
@@ -39,22 +31,6 @@ public class HeartbeatRequestDto {
 
     public void setLeaderId(Integer leaderId) {
         this.leaderId = leaderId;
-    }
-
-    public Integer getPrevLogIndex() {
-        return prevLogIndex;
-    }
-
-    public void setPrevLogIndex(Integer prevLogIndex) {
-        this.prevLogIndex = prevLogIndex;
-    }
-
-    public Long getPrevLogTerm() {
-        return prevLogTerm;
-    }
-
-    public void setPrevLogTerm(Long prevLogTerm) {
-        this.prevLogTerm = prevLogTerm;
     }
 
     public Integer getLeaderCommit() {
