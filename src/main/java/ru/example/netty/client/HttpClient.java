@@ -23,11 +23,7 @@ import java.net.InetSocketAddress;
  */
 public class HttpClient<REQ, RES> {
 
-
-
-    public RES send(REQ req, Class<RES> resClass, String uri) throws InterruptedException {
-        String host = "localhost";
-        int port = 8080;
+    public RES send(REQ req, Class<RES> resClass, String host, String port, String uri) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         HttpClientHandler<REQ, RES> httpClientHandler = new HttpClientHandler<>(req, resClass, uri);
         try {
@@ -35,7 +31,7 @@ public class HttpClient<REQ, RES> {
             b.group(workerGroup);
             b.channel(NioSocketChannel.class);
             b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.remoteAddress(new InetSocketAddress(host, port));
+            b.remoteAddress(new InetSocketAddress(host, Integer.parseInt(port)));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {

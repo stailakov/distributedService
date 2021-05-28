@@ -17,9 +17,13 @@ public class HeartbeatRequestHandler {
 
     Logger log = LoggerFactory.getLogger(HeartbeatRequestHandler.class);
 
-    Context context = new ContextImpl();
-    ElectionTimer electionTimer = ElectionTimer.getInstance();
+    private Context context;
+    private ElectionTimer electionTimer;
 
+    public HeartbeatRequestHandler() {
+        this.context = ContextImpl.getInstance();
+        this.electionTimer =  ElectionTimer.getInstance();
+    }
 
     public HeartbeatResponseDto handle(HeartbeatRequestDto dto){
         context.cancelIfNotActive();

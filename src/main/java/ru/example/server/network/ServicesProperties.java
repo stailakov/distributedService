@@ -15,10 +15,8 @@ public class ServicesProperties {
 
     public ServicesProperties() {
         PropertiesLoader propertiesLoader = new PropertiesLoader();
-        List<String> stringList = propertiesLoader.getList("services");
-        this.services = stringList.stream()
-                .map(e -> JsonUtil.toObject(e, Service.class))
-                .collect(Collectors.toList());
+        String json = propertiesLoader.getString("services");
+        this.services = JsonUtil.toList(json, Service.class);
 
     }
 

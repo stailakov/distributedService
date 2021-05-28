@@ -25,6 +25,7 @@ import ru.example.netty.handler.FilterHandler;
 import ru.example.netty.handler.HttpProcessingHandler;
 import ru.example.server.election.ElectionTimer;
 import ru.example.server.heartbeat.HeartbeatTimer;
+import ru.example.server.node.Peers;
 import ru.example.server.timer.ServerTimer;
 
 import java.nio.charset.StandardCharsets;
@@ -37,7 +38,7 @@ public class HttpServer {
 //
         ServerTimer heartbeatTimer = new HeartbeatTimer();
         ServerTimer electionTimer = ElectionTimer.getInstance();
-
+//init config
 
         HttpServer server = new HttpServer();
         server.start();

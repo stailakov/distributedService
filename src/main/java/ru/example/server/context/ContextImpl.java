@@ -23,11 +23,19 @@ public class ContextImpl implements Context {
     private Peers peers;
     private Term term;
     private NodeProperties nodeProperties;
+    private static ContextImpl instance;
 
-    public ContextImpl() {
+    private ContextImpl() {
         this.peers = new Peers();
         this.nodeProperties = new NodePropertiesImpl();
         this.term = new Term(nodeProperties);
+    }
+
+    public static synchronized ContextImpl getInstance() {
+        if (instance == null) {
+            instance = new ContextImpl();
+        }
+        return instance;
     }
 
     @Override

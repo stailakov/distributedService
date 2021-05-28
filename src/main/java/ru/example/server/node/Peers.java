@@ -16,7 +16,7 @@ public class Peers {
     private final List<Peer> peers = new ArrayList<>();
     private Integer quorum;
 
-    public void Peers() {
+    public Peers() {
         servicesProps = new ServicesProperties();
         nodeProperties = new NodePropertiesImpl();
         servicesProps.getServices().stream().
@@ -26,8 +26,8 @@ public class Peers {
                 forEach(this::add);
 
         quorum = servicesProps.getServices().size()/2+1;
-
     }
+
 
     public Integer getQuorum() {
         return quorum;

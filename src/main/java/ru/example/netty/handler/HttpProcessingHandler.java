@@ -24,11 +24,11 @@ import java.nio.charset.StandardCharsets;
  */
 public class HttpProcessingHandler extends ChannelInboundHandlerAdapter {
 
-    private HeartbeatRequestHandler requestHandler;
+    private HeartbeatRequestHandler heartbeatRequestHandler;
     private KryoConverter converter;
 
     public HttpProcessingHandler() {
-        this.requestHandler = new HeartbeatRequestHandler();
+        this.heartbeatRequestHandler = new HeartbeatRequestHandler();
         this.converter = new KryoConverter();
     }
 
@@ -65,12 +65,9 @@ public class HttpProcessingHandler extends ChannelInboundHandlerAdapter {
         Object object = converter.toObject(content);
         if ("/heartbeat".equals(request.getUri())) {
             HeartbeatRequestDto dto = (HeartbeatRequestDto) object;
-            return handleHeartBeat(dto);
+            return heartbeatRequestHandler.handle(dto);
         }
         return null;
     }
 
-    private HeartbeatResponseDto handleHeartBeat(HeartbeatRequestDto dto) {
-        return requestHandler.handle(dto);
-    }
 }

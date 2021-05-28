@@ -25,7 +25,7 @@ public class PropertiesLoader {
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                 new FileBasedConfigurationBuilder<PropertiesConfiguration>(
                         PropertiesConfiguration.class).configure(params.fileBased()
-                        .setListDelimiterHandler(new DefaultListDelimiterHandler(','))
+//                        .setListDelimiterHandler(new DefaultListDelimiterHandler('\n'))
                         .setFile(new File(COMMON_PROPERTIES_FILENAME)));
         config = builder.getConfiguration();
 
