@@ -1,4 +1,4 @@
-package ru.example.server;
+package ru.example.utils;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;

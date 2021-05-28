@@ -31,7 +31,7 @@ public abstract class ServerTimer {
     }
 
     protected ServerTimer() {
-        this.nodeProperties = new NodePropertiesImpl();
+        this.nodeProperties = NodePropertiesImpl.getInstance();
         start();
     }
 
@@ -43,7 +43,6 @@ public abstract class ServerTimer {
 
         timer.schedule(new TimerTask() {
             @Override
-
             public void run() {
                 if (isRun()) {
                     counter.incrementAndGet();

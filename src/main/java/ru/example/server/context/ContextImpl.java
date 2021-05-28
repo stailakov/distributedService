@@ -27,7 +27,7 @@ public class ContextImpl implements Context {
 
     private ContextImpl() {
         this.peers = new Peers();
-        this.nodeProperties = new NodePropertiesImpl();
+        this.nodeProperties = NodePropertiesImpl.getInstance();
         this.term = new Term(nodeProperties);
     }
 

@@ -18,7 +18,7 @@ public class Peers {
 
     public Peers() {
         servicesProps = new ServicesProperties();
-        nodeProperties = new NodePropertiesImpl();
+        nodeProperties = NodePropertiesImpl.getInstance();
         servicesProps.getServices().stream().
                 map(Service::getName).
                 map(Integer::parseInt).

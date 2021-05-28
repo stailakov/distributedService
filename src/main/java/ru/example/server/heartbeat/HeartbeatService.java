@@ -7,6 +7,7 @@ import ru.example.netty.dto.HeartbeatRequestDto;
 import ru.example.netty.dto.HeartbeatResponseDto;
 import ru.example.server.context.Context;
 import ru.example.server.context.ContextImpl;
+import ru.example.server.election.ElectionTimer;
 import ru.example.server.network.Service;
 import ru.example.server.network.ServicesProperties;
 import ru.example.server.node.Peer;
@@ -17,6 +18,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static ru.example.server.node.State.FOLLOWER;
+
 /**
  * @author TaylakovSA
  */
@@ -25,12 +28,15 @@ public class HeartbeatService {
     Logger log = LoggerFactory.getLogger(HeartbeatService.class);
 
     private Context context;
+    private ElectionTimer electionTimer;
     private HttpClient<HeartbeatRequestDto, HeartbeatResponseDto> httpClient;
-    ServicesProperties servicesProperties = new ServicesProperties();
+    ServicesProperties servicesProperties;
 
     public HeartbeatService() {
         context = ContextImpl.getInstance();
+        electionTimer = ElectionTimer.getInstance();
         httpClient = new HttpClient<>();
+        servicesProperties = new ServicesProperties();
     }
 
     public void processHeartbeat(){
@@ -78,16 +84,36 @@ public class HeartbeatService {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Service service = servicesProperties.getByName(String.valueOf(id));
-                HeartbeatResponseDto send = httpClient.send(createRequest(), HeartbeatResponseDto.class,
+                HeartbeatResponseDto responseDto = httpClient.send(createRequest(), HeartbeatResponseDto.class,
                         service.getHost(), service.getPort(), "/heartbeat");
 
-                return Optional.ofNullable(send).
+                return Optional.ofNullable(responseDto).
                         orElse(new HeartbeatResponseDto(id, "NO_CONTENT"));
             } catch (Exception e) {
                 log.error("Peer #{} {} request error for Heartbeat. {} {} ", context.getId(), id, e.getClass(),e.getMessage());
                 return new HeartbeatResponseDto(id, "SERVICE_UNAVAILABLE");
             }
         });
+    }
+
+    public HeartbeatResponseDto handle(HeartbeatRequestDto dto){
+        context.cancelIfNotActive();
+
+        if (dto.getTerm() < context.getCurrentTerm()) {
+            log.info("Peer #{} Rejected request from {}. Term {} too small", context.getId(), dto.getLeaderId(),
+                    dto.getTerm());
+            return new HeartbeatResponseDto(context.getId(), context.getCurrentTerm(), false);
+        } else if (dto.getTerm() > context.getCurrentTerm()) {
+            context.setCurrentTerm(dto.getTerm());
+            context.setVotedFor(null);
+        }
+        //reset election timer
+        electionTimer.reset();
+        // convert to follower because just one Leader
+        if (!context.getState().equals(FOLLOWER)) {
+            context.setState(FOLLOWER);
+        }
+        return new HeartbeatResponseDto(context.getId(), context.getCurrentTerm(), true);
     }
 
     private HeartbeatRequestDto createRequest(){

@@ -1,4 +1,4 @@
-package ru.example.server;
+package ru.example.utils;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

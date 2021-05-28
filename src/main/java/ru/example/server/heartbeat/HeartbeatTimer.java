@@ -32,6 +32,7 @@ public class HeartbeatTimer extends ServerTimer {
 
     @Override
     protected boolean isRun() {
+        System.out.println(nodeProperties.getState());
         return nodeProperties.getActive() && nodeProperties.getState().equals(LEADER);
     }
 }

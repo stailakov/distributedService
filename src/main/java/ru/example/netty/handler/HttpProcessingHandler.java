@@ -13,9 +13,10 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import ru.example.HttpServer;
 import ru.example.netty.dto.HeartbeatRequestDto;
-import ru.example.netty.dto.HeartbeatResponseDto;
-import ru.example.server.KryoConverter;
-import ru.example.server.handler.HeartbeatRequestHandler;
+import ru.example.netty.dto.RequestVoteDto;
+import ru.example.server.election.ElectionService;
+import ru.example.server.heartbeat.HeartbeatService;
+import ru.example.utils.KryoConverter;
 
 import java.nio.charset.StandardCharsets;
 
@@ -24,12 +25,14 @@ import java.nio.charset.StandardCharsets;
  */
 public class HttpProcessingHandler extends ChannelInboundHandlerAdapter {
 
-    private HeartbeatRequestHandler heartbeatRequestHandler;
+    private HeartbeatService heartbeatService;
+    private ElectionService electionService;
     private KryoConverter converter;
 
     public HttpProcessingHandler() {
-        this.heartbeatRequestHandler = new HeartbeatRequestHandler();
+        this.heartbeatService = new HeartbeatService();
         this.converter = new KryoConverter();
+        this.electionService = new ElectionService();
     }
 
     @Override
@@ -65,7 +68,10 @@ public class HttpProcessingHandler extends ChannelInboundHandlerAdapter {
         Object object = converter.toObject(content);
         if ("/heartbeat".equals(request.getUri())) {
             HeartbeatRequestDto dto = (HeartbeatRequestDto) object;
-            return heartbeatRequestHandler.handle(dto);
+            return heartbeatService.handle(dto);
+        } else if ("/election".equals(request.getUri())) {
+            RequestVoteDto dto = (RequestVoteDto) object;
+            return electionService.vote(dto);
         }
         return null;
     }

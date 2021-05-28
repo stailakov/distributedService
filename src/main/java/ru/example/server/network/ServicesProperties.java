@@ -1,10 +1,9 @@
 package ru.example.server.network;
 
-import ru.example.server.JsonUtil;
+import ru.example.utils.JsonUtil;
 import ru.example.server.config.PropertiesLoader;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author TaylakovSA

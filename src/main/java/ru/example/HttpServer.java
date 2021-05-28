@@ -21,11 +21,9 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import ru.example.netty.handler.FilterHandler;
 import ru.example.netty.handler.HttpProcessingHandler;
 import ru.example.server.election.ElectionTimer;
 import ru.example.server.heartbeat.HeartbeatTimer;
-import ru.example.server.node.Peers;
 import ru.example.server.timer.ServerTimer;
 
 import java.nio.charset.StandardCharsets;
@@ -36,16 +34,17 @@ import java.nio.charset.StandardCharsets;
 public class HttpServer {
     public static void main(String[] args) throws Exception {
 //
+        String port = args[0];
+
         ServerTimer heartbeatTimer = new HeartbeatTimer();
         ServerTimer electionTimer = ElectionTimer.getInstance();
-//init config
-
         HttpServer server = new HttpServer();
-        server.start();
+        server.start(Integer.parseInt(port));
+
+
     }
 
-    public void start() throws InterruptedException {
-        Kryo kryo = new Kryo();
+    public void start(int port) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         ChannelFuture channelFuture = null;
@@ -62,11 +61,7 @@ public class HttpServer {
                                             new HttpResponseEncoder(),
                                             new HttpRequestDecoder(),
                                             new HttpObjectAggregator(Integer.MAX_VALUE),
-//                                            new FilterHandler(),
                                             new HttpProcessingHandler()
-//                                            new ObjectDecoder(kryo),
-//                                            new ObjectEncoder(kryo),
-//                                            new HeartbeatProcessingHandler()
                                     );
                             ;
                         }
@@ -74,7 +69,7 @@ public class HttpServer {
                     .option(ChannelOption.SO_BACKLOG, 500)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            channelFuture = server.bind("localhost", 8080).sync();
+            channelFuture = server.bind("localhost", port).sync();
 
             channelFuture.channel().closeFuture().sync();
 

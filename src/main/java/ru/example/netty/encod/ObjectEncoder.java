@@ -5,7 +5,6 @@ import com.esotericsoftware.kryo.io.Output;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import ru.example.server.JsonUtil;
 
 import java.io.ByteArrayOutputStream;
 

@@ -3,6 +3,8 @@ package ru.example.server.node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.example.server.config.PropertiesLoader;
+import ru.example.server.election.ElectionService;
+import ru.example.server.election.ElectionTimer;
 import ru.example.server.exceptions.NotActiveException;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +20,7 @@ public class NodePropertiesImpl implements NodeProperties {
     final static Logger log = LoggerFactory.getLogger(NodePropertiesImpl.class);
 
     private Integer id;
-    private volatile State state = LEADER;
+    private volatile State state = FOLLOWER;
     private final AtomicInteger commitIndex = new AtomicInteger(-1);
     private final AtomicInteger lastApplied = new AtomicInteger(-1);
     Boolean active = true;
@@ -26,7 +28,16 @@ public class NodePropertiesImpl implements NodeProperties {
     Integer electionTimeout;
     Integer heartBeatTimeout;
 
-    public NodePropertiesImpl() {
+    private static NodePropertiesImpl instance;
+
+    public static synchronized NodePropertiesImpl getInstance() {
+        if (instance == null) {
+            instance = new NodePropertiesImpl();
+        }
+        return instance;
+    }
+
+    private NodePropertiesImpl() {
         PropertiesLoader propertiesLoader = new PropertiesLoader();
         this.id = propertiesLoader.getInt("node.id");
         this.electionTimeout = propertiesLoader.getInt("node.election-timeout");
