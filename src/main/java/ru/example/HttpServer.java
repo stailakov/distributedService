@@ -1,6 +1,5 @@
 package ru.example;
 
-import com.esotericsoftware.kryo.Kryo;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,7 +20,10 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+import org.apache.commons.cli.CommandLine;
 import ru.example.netty.handler.HttpProcessingHandler;
+import ru.example.server.config.CLIParser;
+import ru.example.server.config.PropertiesLoader;
 import ru.example.server.election.ElectionTimer;
 import ru.example.server.heartbeat.HeartbeatTimer;
 import ru.example.server.timer.ServerTimer;
@@ -32,15 +34,28 @@ import java.nio.charset.StandardCharsets;
  * @author TaylakovSA
  */
 public class HttpServer {
+
     public static void main(String[] args) throws Exception {
-//
-        String port = args[0];
+        CommandLine commandLine = initConfig(args);
 
         ServerTimer heartbeatTimer = new HeartbeatTimer();
         ServerTimer electionTimer = ElectionTimer.getInstance();
         HttpServer server = new HttpServer();
+
+        String port = commandLine.getOptionValue("port");
+
         server.start(Integer.parseInt(port));
 
+    }
+
+    private static CommandLine initConfig(String[] args) {
+        PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+        CLIParser cliParser = new CLIParser();
+        CommandLine commandLine = cliParser.parseCLI(args);
+        propertiesLoader.setProperty("election-timeout", commandLine.getOptionValue("election-timeout"));
+        propertiesLoader.setProperty("heartbeat-timeout", commandLine.getOptionValue("heartbeat-timeout"));
+        propertiesLoader.setProperty("node-id", commandLine.getOptionValue("node-id"));
+        return commandLine;
 
     }
 

@@ -13,7 +13,7 @@ public class ServicesProperties {
     private List<Service> services;
 
     public ServicesProperties() {
-        PropertiesLoader propertiesLoader = new PropertiesLoader();
+        PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
         String json = propertiesLoader.getString("services");
         this.services = JsonUtil.toList(json, Service.class);
 

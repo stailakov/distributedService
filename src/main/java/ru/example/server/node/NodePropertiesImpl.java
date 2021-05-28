@@ -1,7 +1,9 @@
 package ru.example.server.node;
 
+import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.example.server.config.CLIParser;
 import ru.example.server.config.PropertiesLoader;
 import ru.example.server.election.ElectionService;
 import ru.example.server.election.ElectionTimer;
@@ -10,7 +12,6 @@ import ru.example.server.exceptions.NotActiveException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ru.example.server.node.State.FOLLOWER;
-import static ru.example.server.node.State.LEADER;
 
 /**
  * @author TaylakovSA
@@ -38,10 +39,11 @@ public class NodePropertiesImpl implements NodeProperties {
     }
 
     private NodePropertiesImpl() {
-        PropertiesLoader propertiesLoader = new PropertiesLoader();
-        this.id = propertiesLoader.getInt("node.id");
-        this.electionTimeout = propertiesLoader.getInt("node.election-timeout");
-        this.heartBeatTimeout = propertiesLoader.getInt("node.heartbeat-timeout");
+        PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
+        this.id = propertiesLoader.getInt("node-id");
+
+        this.electionTimeout = propertiesLoader.getInt("election-timeout");
+        this.heartBeatTimeout = propertiesLoader.getInt("heartbeat-timeout");
     }
 
     public Integer getId() {
