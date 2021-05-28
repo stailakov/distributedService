@@ -8,45 +8,56 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import ru.example.netty.decod.ResponseDataDecoder;
-import ru.example.netty.encod.RequestDataEncoder;
-import ru.example.netty.handler.ClientHandler;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestEncoder;
+import io.netty.handler.codec.http.HttpResponseDecoder;
+import io.netty.util.concurrent.FutureListener;
+
+import ru.example.netty.handler.HttpClientHandler;
 
 import java.net.InetSocketAddress;
 
 /**
  * @author TaylakovSA
  */
-public class HttpClient {
+public class HttpClient<REQ, RES> {
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("start");
-        String host = "localhost";
-        int port =8080;
+    public RES send(REQ req, Class<RES> resClass, String host, String port, String uri) throws InterruptedException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-
+        HttpClientHandler<REQ, RES> httpClientHandler = new HttpClientHandler<>(req, resClass, uri);
         try {
-            Bootstrap b = new Bootstrap(); // (1)
-            b.group(workerGroup); // (2)
-            b.channel(NioSocketChannel.class); // (3)
-            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-            b.remoteAddress(new InetSocketAddress(host, port));
+            Bootstrap b = new Bootstrap();
+            b.group(workerGroup);
+            b.channel(NioSocketChannel.class);
+            b.option(ChannelOption.SO_KEEPALIVE, true);
+            b.remoteAddress(new InetSocketAddress(host, Integer.parseInt(port)));
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline()
-                            .addLast(new RequestDataEncoder(),
-                                    new ResponseDataDecoder(), new ClientHandler());
+                            .addLast(
+                                    new HttpRequestEncoder(),
+                                    new HttpResponseDecoder(),
+                                    new HttpObjectAggregator(Integer.MAX_VALUE),
+                                    httpClientHandler
+
+                            );
                 }
             });
 
-            // Start the client.
-            ChannelFuture f = b.connect().sync(); // (5)
-
-            // Wait until the connection is closed.
+            ChannelFuture f = b.connect();
+            f.addListener((FutureListener<Void>) future -> {
+                if (!f.isSuccess()) {
+                    throw new Exception("Test Connection failed");
+                }
+            });
+            f.sync();
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
         }
+
+        return httpClientHandler.getFuture();
     }
+
 }

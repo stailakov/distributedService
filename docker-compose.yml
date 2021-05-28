@@ -1,0 +1,16 @@
+version: '3.3'
+services:
+  distrib-1:
+    build: .
+    image: distrib:test
+    command: java -jar /usr/local/lib/destributedService.jar -p 9090 -h distrib-1 -election 10 -heartbeat 5 -n 1
+
+  distrib-2:
+    build: .
+    image: distrib:test
+    command: java -jar /usr/local/lib/destributedService.jar -p 9090 -h distrib-2 -election 10 -heartbeat 5 -n 2
+
+  distrib-3:
+    build: .
+    image: distrib:test
+    command: java -jar /usr/local/lib/destributedService.jar -p 9090 -h distrib-3 -election 10 -heartbeat 5 -n 3

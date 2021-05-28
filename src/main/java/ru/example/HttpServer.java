@@ -15,19 +15,58 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
-import ru.example.netty.decod.RequestDecoder;
-import ru.example.netty.encod.ResponseDataEncoder;
-import ru.example.netty.handler.ProcessingHandler;
+import org.apache.commons.cli.CommandLine;
+import ru.example.netty.handler.FilterHandler;
+import ru.example.netty.handler.HttpProcessingHandler;
+import ru.example.server.config.CLIParser;
+import ru.example.server.config.PropertiesLoader;
+import ru.example.server.election.ElectionTimer;
+import ru.example.server.heartbeat.HeartbeatTimer;
+import ru.example.server.timer.ServerTimer;
 
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
  * @author TaylakovSA
  */
 public class HttpServer {
+    static PropertiesLoader propertiesLoader;
+    static {
+        propertiesLoader = PropertiesLoader.getInstance();
+    }
+
     public static void main(String[] args) throws Exception {
+        CommandLine commandLine = initConfig(args);
+
+        ServerTimer heartbeatTimer = new HeartbeatTimer();
+        ServerTimer electionTimer = ElectionTimer.getInstance();
+        HttpServer server = new HttpServer();
+
+        String port = commandLine.getOptionValue("port");
+        String host = commandLine.getOptionValue("host");
+
+        server.start(host, Integer.parseInt(port));
+
+    }
+
+    private static CommandLine initConfig(String[] args) {
+        CLIParser cliParser = new CLIParser();
+        CommandLine commandLine = cliParser.parseCLI(args);
+        propertiesLoader.setProperty("election-timeout", commandLine.getOptionValue("election-timeout"));
+        propertiesLoader.setProperty("heartbeat-timeout", commandLine.getOptionValue("heartbeat-timeout"));
+        propertiesLoader.setProperty("node-id", commandLine.getOptionValue("node-id"));
+        return commandLine;
+
+    }
+
+    public void start(String host, int port) throws InterruptedException, UnknownHostException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         ChannelFuture channelFuture = null;
@@ -40,16 +79,20 @@ public class HttpServer {
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new RequestDecoder(),
-                                            new ResponseDataEncoder(),
-                                            new ProcessingHandler());
+                                    .addLast(
+                                            new HttpResponseEncoder(),
+                                            new HttpRequestDecoder(),
+                                            new HttpObjectAggregator(Integer.MAX_VALUE),
+                                            new FilterHandler(),
+                                            new HttpProcessingHandler()
+                                    );
                             ;
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 500)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            channelFuture = server.bind("localhost", 8080).sync();
+            channelFuture = server.bind(new InetSocketAddress(host, port)).sync();
 
             channelFuture.channel().closeFuture().sync();
 
