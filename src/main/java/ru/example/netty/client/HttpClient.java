@@ -1,6 +1,5 @@
 package ru.example.netty.client;
 
-import com.esotericsoftware.kryo.Kryo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

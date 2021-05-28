@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static ru.example.netty.client.ApiUri.HEARTBEAT;
 import static ru.example.server.node.State.FOLLOWER;
 
 /**
@@ -85,7 +86,7 @@ public class HeartbeatService {
             try {
                 Service service = servicesProperties.getByName(String.valueOf(id));
                 HeartbeatResponseDto responseDto = httpClient.send(createRequest(), HeartbeatResponseDto.class,
-                        service.getHost(), service.getPort(), "/heartbeat");
+                        service.getHost(), service.getPort(), HEARTBEAT);
 
                 return Optional.ofNullable(responseDto).
                         orElse(new HeartbeatResponseDto(id, "NO_CONTENT"));

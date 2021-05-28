@@ -8,7 +8,6 @@ public class Service {
     private String name;
     private String host;
     private String port;
-    private String version;
 
     public String getName() {
         return name;
@@ -22,7 +21,4 @@ public class Service {
         return port;
     }
 
-    public String getVersion() {
-        return version;
-    }
 }

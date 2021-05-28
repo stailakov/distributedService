@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map;
 
+import static ru.example.netty.client.ApiUri.ELECTION;
+import static ru.example.netty.client.ApiUri.HEARTBEAT;
+
 /**
  * @author TaylakovSA
  */
@@ -19,8 +22,8 @@ public class FilterHandler extends MessageToMessageDecoder<DefaultFullHttpReques
 
     public FilterHandler() {
         requestMapping = new HashMap<>();
-        requestMapping.put("/heartbeat", Set.of(HttpMethod.POST));
-        requestMapping.put("/election", Set.of(HttpMethod.POST));
+        requestMapping.put(HEARTBEAT, Set.of(HttpMethod.POST));
+        requestMapping.put(ELECTION, Set.of(HttpMethod.POST));
     }
 
     @Override

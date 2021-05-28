@@ -33,7 +33,6 @@ public class PropertiesLoader {
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                 new FileBasedConfigurationBuilder<PropertiesConfiguration>(
                         PropertiesConfiguration.class).configure(params.fileBased()
-//                        .setListDelimiterHandler(new DefaultListDelimiterHandler('\n'))
                         .setFile(new File(COMMON_PROPERTIES_FILENAME)));
         config = builder.getConfiguration();
 
@@ -43,12 +42,9 @@ public class PropertiesLoader {
 
     }
 
-
-
     public String getString(String key) {
         return config.getString(key);
     }
-
 
     public void setProperty(String key, Object value) {
         config.setProperty(key, value);

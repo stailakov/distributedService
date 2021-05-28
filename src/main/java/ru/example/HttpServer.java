@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import org.apache.commons.cli.CommandLine;
+import ru.example.netty.handler.FilterHandler;
 import ru.example.netty.handler.HttpProcessingHandler;
 import ru.example.server.config.CLIParser;
 import ru.example.server.config.PropertiesLoader;
@@ -28,12 +29,18 @@ import ru.example.server.election.ElectionTimer;
 import ru.example.server.heartbeat.HeartbeatTimer;
 import ru.example.server.timer.ServerTimer;
 
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 /**
  * @author TaylakovSA
  */
 public class HttpServer {
+    static PropertiesLoader propertiesLoader;
+    static {
+        propertiesLoader = PropertiesLoader.getInstance();
+    }
 
     public static void main(String[] args) throws Exception {
         CommandLine commandLine = initConfig(args);
@@ -43,13 +50,13 @@ public class HttpServer {
         HttpServer server = new HttpServer();
 
         String port = commandLine.getOptionValue("port");
+        String host = commandLine.getOptionValue("host");
 
-        server.start(Integer.parseInt(port));
+        server.start(host, Integer.parseInt(port));
 
     }
 
     private static CommandLine initConfig(String[] args) {
-        PropertiesLoader propertiesLoader = PropertiesLoader.getInstance();
         CLIParser cliParser = new CLIParser();
         CommandLine commandLine = cliParser.parseCLI(args);
         propertiesLoader.setProperty("election-timeout", commandLine.getOptionValue("election-timeout"));
@@ -59,7 +66,7 @@ public class HttpServer {
 
     }
 
-    public void start(int port) throws InterruptedException {
+    public void start(String host, int port) throws InterruptedException, UnknownHostException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         ChannelFuture channelFuture = null;
@@ -76,6 +83,7 @@ public class HttpServer {
                                             new HttpResponseEncoder(),
                                             new HttpRequestDecoder(),
                                             new HttpObjectAggregator(Integer.MAX_VALUE),
+                                            new FilterHandler(),
                                             new HttpProcessingHandler()
                                     );
                             ;
@@ -84,7 +92,7 @@ public class HttpServer {
                     .option(ChannelOption.SO_BACKLOG, 500)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            channelFuture = server.bind("localhost", port).sync();
+            channelFuture = server.bind(new InetSocketAddress(host, port)).sync();
 
             channelFuture.channel().closeFuture().sync();
 

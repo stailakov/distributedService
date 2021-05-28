@@ -1,5 +1,7 @@
 package ru.example.server.heartbeat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.example.server.timer.ServerTimer;
 
 import static ru.example.server.node.State.LEADER;
@@ -8,6 +10,8 @@ import static ru.example.server.node.State.LEADER;
  * @author TaylakovSA
  */
 public class HeartbeatTimer extends ServerTimer {
+
+    Logger log = LoggerFactory.getLogger(HeartbeatTimer.class);
 
     private HeartbeatService heartbeatService;
 
@@ -32,7 +36,7 @@ public class HeartbeatTimer extends ServerTimer {
 
     @Override
     protected boolean isRun() {
-        System.out.println(nodeProperties.getState());
+        log.info("Current state: {}", nodeProperties.getState());
         return nodeProperties.getActive() && nodeProperties.getState().equals(LEADER);
     }
 }

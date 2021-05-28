@@ -20,6 +20,9 @@ import ru.example.utils.KryoConverter;
 
 import java.nio.charset.StandardCharsets;
 
+import static ru.example.netty.client.ApiUri.ELECTION;
+import static ru.example.netty.client.ApiUri.HEARTBEAT;
+
 /**
  * @author TaylakovSA
  */
@@ -66,10 +69,10 @@ public class HttpProcessingHandler extends ChannelInboundHandlerAdapter {
     private Object handle(FullHttpRequest request) {
         ByteBuf content = request.content();
         Object object = converter.toObject(content);
-        if ("/heartbeat".equals(request.getUri())) {
+        if (HEARTBEAT.equals(request.getUri())) {
             HeartbeatRequestDto dto = (HeartbeatRequestDto) object;
             return heartbeatService.handle(dto);
-        } else if ("/election".equals(request.getUri())) {
+        } else if (ELECTION.equals(request.getUri())) {
             RequestVoteDto dto = (RequestVoteDto) object;
             return electionService.vote(dto);
         }

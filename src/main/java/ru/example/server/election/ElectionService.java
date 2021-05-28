@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import static ru.example.netty.client.ApiUri.ELECTION;
 import static ru.example.server.node.State.CANDIDATE;
 import static ru.example.server.node.State.FOLLOWER;
 import static ru.example.server.node.State.LEADER;
@@ -25,7 +26,6 @@ import static ru.example.server.node.State.LEADER;
  * @author TaylakovSA
  */
 public class ElectionService {
-    private static final String ELECTION_URI = "/election";
     private static final int VOTE_RETRY_DELAY = 2000;
     private final Logger log = LoggerFactory.getLogger(ElectionService.class);
     private Context context;
@@ -117,7 +117,7 @@ public class ElectionService {
                 RequestVoteDto requestVoteDTO = new RequestVoteDto(term, context.getId());
                 Service service = servicesProperties.getByName(String.valueOf(id));
                 ResponseVoteDto send = httpClient.send(requestVoteDTO, ResponseVoteDto.class,
-                        service.getHost(), service.getPort(), ELECTION_URI);
+                        service.getHost(), service.getPort(), ELECTION);
 
                 return Optional.ofNullable(send).
                         orElse(new ResponseVoteDto(id, "NO_CONTENT"));

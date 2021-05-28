@@ -21,15 +21,19 @@ public class CLIParser {
         port.setRequired(true);
         options.addOption(port);
 
-        Option heartbeatTimeout = new Option("e", "election-timeout", true, "Election timeout");
-        port.setRequired(true);
+        Option host = new Option("h", "host", true, "service host");
+        host.setRequired(true);
+        options.addOption(host);
+
+        Option heartbeatTimeout = new Option("election", "election-timeout", true, "Election timeout");
+        heartbeatTimeout.setRequired(true);
         options.addOption(heartbeatTimeout);
 
-        Option electionTimeout = new Option("h", "heartbeat-timeout", true, "Heartbeat timeout");
-        port.setRequired(true);
+        Option electionTimeout = new Option("heartbeat", "heartbeat-timeout", true, "Heartbeat timeout");
+        electionTimeout.setRequired(true);
         options.addOption(electionTimeout);
         Option nodeId = new Option("n", "node-id", true, "ID Node");
-        port.setRequired(true);
+        nodeId.setRequired(true);
         options.addOption(nodeId);
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
