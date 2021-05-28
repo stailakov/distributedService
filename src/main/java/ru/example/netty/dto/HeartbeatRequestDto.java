@@ -5,6 +5,8 @@ package ru.example.netty.dto;
  */
 public class HeartbeatRequestDto {
 
+    public HeartbeatRequestDto() {
+    }
 
     public HeartbeatRequestDto(Long term, Integer leaderId, Integer leaderCommit) {
         this.term = term;

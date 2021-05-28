@@ -1,5 +1,6 @@
 package ru.example.netty.client;
 
+import com.esotericsoftware.kryo.Kryo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -21,6 +22,8 @@ import java.net.InetSocketAddress;
  * @author TaylakovSA
  */
 public class HttpClient<REQ, RES> {
+
+
 
     public RES send(REQ req, Class<RES> resClass, String uri) throws InterruptedException {
         String host = "localhost";

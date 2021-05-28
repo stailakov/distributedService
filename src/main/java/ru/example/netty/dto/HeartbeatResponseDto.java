@@ -11,7 +11,6 @@ public class HeartbeatResponseDto  {
 
     private Boolean success;
 
-
     private String statusCode;
 
     public HeartbeatResponseDto() {
